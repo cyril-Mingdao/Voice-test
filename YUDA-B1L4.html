@@ -1690,7 +1690,8 @@
     }
 
     #ad-lesson {
-      flex: 2 1 260px;
+      flex: 1 1 260px;
+      max-width: 560px;
     }
 
     .admin-books {
@@ -1821,6 +1822,7 @@
       }
 
       #ad-lesson,
+      #ad-sort,
       #ad-search {
         grid-column: 1 / -1;
       }
@@ -2069,6 +2071,9 @@
      <div class="chip-row admin-books" id="ad-books" aria-label="版本"></div>
      <div class="admin-toolbar">
       <select id="ad-lesson" aria-label="課次"></select>
+     </div>
+     <div class="chip-row admin-books" id="ad-depts" aria-label="部別"></div>
+     <div class="admin-toolbar">
       <select id="ad-cls" aria-label="班級"></select>
       <select id="ad-status" aria-label="狀態">
        <option value="">全部紀錄</option>
@@ -2076,6 +2081,12 @@
        <option value="unreviewed">可疑音檔且未審查</option>
        <option value="cheat">判定作弊</option>
        <option value="retest">需重測</option>
+      </select>
+      <select id="ad-sort" aria-label="排序">
+       <option value="seat">依班級座號排序</option>
+       <option value="time-desc">依時間排序（新→舊）</option>
+       <option value="time-asc">依時間排序（舊→新）</option>
+       <option value="score-desc">依分數排序（高→低）</option>
       </select>
       <input id="ad-search" placeholder="搜尋姓名／信箱" aria-label="搜尋">
      </div>
@@ -2589,13 +2600,14 @@
     /* 部別與班級：學生用點選的，班級名稱才會一致（收件程式也用同一份名單檢查） */
     const range = (prefix, n) => Array.from({ length: n }, (_, i) => prefix + (i + 1));
     /* blocks：每個 block 是一張獨立的格線（block 之間留間隔）；block 裡的 group 各自一個底色。
-       perRow：這一組每排最多幾個（高中部一排 6 班）；沒設就照格線欄數排滿。 */
+       perRow：這一組每排最多幾個（高中部一排 6 班）；沒設就照格線欄數排滿。
+       row：這一組從新的一排開始（技高部每個科別各一排）。 */
     const DEPARTMENTS = [
       { name: '高中部', blocks: [[{ classes: range('高一', 12), perRow: 6 }]] },
       { name: '技高部', blocks: [[
-        { classes: range('商二', 4) }, { classes: range('餐二', 3) }, { classes: range('廣二', 3) },
-        { classes: range('美二', 2) }, { classes: range('英二', 2) }, { classes: range('訊二', 2) },
-        { classes: range('子二', 2) }, { classes: range('觀二', 1) }]] },
+        { classes: range('商二', 4), row: true }, { classes: range('餐二', 3), row: true }, { classes: range('廣二', 3), row: true },
+        { classes: range('美二', 2), row: true }, { classes: range('英二', 2), row: true }, { classes: range('訊二', 2), row: true },
+        { classes: range('子二', 2), row: true }, { classes: range('觀二', 1), row: true }]] },
       { name: '國中部', blocks: [[{ classes: range('國一', 20) }], [{ classes: range('國二', 20) }]] },
       { name: '國際部', blocks: [[{ classes: ['701', '702'] }, { classes: ['1001', '1002'] }]] }
     ];
@@ -2623,7 +2635,7 @@
               const per = g.perRow ? Math.min(g.perRow, cols) : 0;
               return g.classes.map((c, i) =>
                 `<button type="button" class="chip pick tint-${t}${pf.cls === c ? ' on' : ''}" data-cls="${c}"` +
-                (per && i % per === 0 ? ' style="grid-column-start:1"' : '') + `>${c}</button>`).join('');
+                ((per && i % per === 0) || (g.row && i === 0) ? ' style="grid-column-start:1"' : '') + `>${c}</button>`).join('');
             }).join('') + '</div>').join('')
         : '<span class="hint">請先點選部別</span>';
       const seats = document.getElementById('pf-seats');
@@ -3355,7 +3367,10 @@
        教師帳號名單由收件程式（CONFIG.TEACHERS）判定，網頁只負責顯示。
        音檔一律經收件程式轉送（檔案在 cyril 的雲端硬碟，其他老師沒有直接存取權）。 */
 
-    const admin = { attempts: [], lessons: [], selected: new Set(), audioCache: {}, book: null };
+    const admin = { attempts: [], lessons: [], selected: new Set(), audioCache: {}, book: null, dept: '' };
+    const CLASS_ORDER = DEPARTMENTS.flatMap(d => d.blocks.flat().flatMap(g => g.classes));
+    const TEACHER_DEPT = '教師';
+    const OTHER_DEPT = '其他';
     const MOBILE = window.matchMedia('(max-width: 640px)');
     const OTHER_BOOK = '其他';
     const adminPlayer = new Audio();
@@ -3435,6 +3450,44 @@
       return lessons;
     }
 
+    function deptOfAttempt(a) {
+      return deptOfClass(a.cls) || (a.cls === TEACHER_DEPT ? TEACHER_DEPT : OTHER_DEPT);
+    }
+
+    function classRank(cls) {
+      const i = CLASS_ORDER.indexOf(cls);
+      return i < 0 ? CLASS_ORDER.length + (cls === TEACHER_DEPT ? 1 : 0) : i;
+    }
+
+    /* 目前課次（或版本）範圍內的作答，用來算各班筆數 */
+    function lessonScope() {
+      const lesson = document.getElementById('ad-lesson').value;
+      return admin.attempts.filter(a => lesson ? a.lesson === lesson : (!admin.book || bookOf(a.lesson) === admin.book));
+    }
+
+    function renderDeptChips() {
+      const present = new Set(admin.attempts.map(deptOfAttempt));
+      const depts = [...DEPARTMENTS.map(d => d.name), ...[TEACHER_DEPT, OTHER_DEPT].filter(d => present.has(d))];
+      document.getElementById('ad-depts').innerHTML = [['', '全部部別'], ...depts.map(d => [d, d])].map(([v, label]) =>
+        `<button type="button" class="chip${admin.dept === v ? ' on' : ''}" data-dept-filter="${escapeHtml(v)}">${escapeHtml(label)}</button>`).join('');
+    }
+
+    /* 班級選單：選了部別就列出該部別全部班級（附目前課次的筆數），方便逐班整理 */
+    function fillClassSelect() {
+      const sel = document.getElementById('ad-cls');
+      const cur = sel.value;
+      const counts = {};
+      lessonScope().forEach(a => { counts[a.cls] = (counts[a.cls] || 0) + 1; });
+      const dept = DEPARTMENTS.find(d => d.name === admin.dept);
+      let classes = dept
+        ? dept.blocks.flat().flatMap(g => g.classes)
+        : [...new Set(admin.attempts.filter(a => !admin.dept || deptOfAttempt(a) === admin.dept).map(a => a.cls).filter(Boolean))];
+      classes = classes.sort((x, y) => classRank(x) - classRank(y) || String(x).localeCompare(String(y)));
+      sel.innerHTML = `<option value="">${admin.dept ? escapeHtml(admin.dept) + ' 全部班級' : '全部班級'}</option>` +
+        classes.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}${counts[c] ? `（${counts[c]} 筆）` : '（0 筆）'}</option>`).join('');
+      if (classes.includes(cur)) sel.value = cur;
+    }
+
     function fillAdminFilters() {
       const lessonSel = document.getElementById('ad-lesson');
       const first = admin.book === null;
@@ -3442,18 +3495,19 @@
       renderBookChips();
       const lessons = fillLessonSelect();
       if (first && lessons.includes(QUIZ_CONFIG.lesson)) lessonSel.value = QUIZ_CONFIG.lesson;
-      const classes = [...new Set(admin.attempts.map(a => a.cls).filter(Boolean))].sort();
-      fillSelect(document.getElementById('ad-cls'), classes, '全部班級');
+      renderDeptChips();
+      fillClassSelect();
     }
 
     function adminFilter(opts) {
       const lesson = document.getElementById('ad-lesson').value;
       const cls = document.getElementById('ad-cls').value;
       const status = opts && opts.ignoreStatus ? '' : document.getElementById('ad-status').value;
+      const deptOk = a => cls ? a.cls === cls : (!admin.dept || deptOfAttempt(a) === admin.dept);
       const q = opts && opts.ignoreStatus ? '' : document.getElementById('ad-search').value.trim().toLowerCase();
       return admin.attempts.filter(a =>
         (lesson ? a.lesson === lesson : (!admin.book || bookOf(a.lesson) === admin.book)) &&
-        (!cls || a.cls === cls) &&
+        deptOk(a) &&
         (!status ||
           (status === 'suspected' && a.suspected > 0) ||
           (status === 'unreviewed' && a.suspected > 0 && !a.verdict) ||
@@ -3463,8 +3517,18 @@
     }
 
     function byClassSeat(a, b) {
-      return String(a.cls).localeCompare(String(b.cls), 'zh-Hant', { numeric: true }) ||
+      return classRank(a.cls) - classRank(b.cls) ||
+        String(a.cls).localeCompare(String(b.cls), 'zh-Hant', { numeric: true }) ||
         (Number(a.seat) || 0) - (Number(b.seat) || 0) || b.ts - a.ts;
+    }
+
+    function adminSorter() {
+      switch (document.getElementById('ad-sort').value) {
+        case 'time-desc': return (a, b) => b.ts - a.ts;
+        case 'time-asc': return (a, b) => a.ts - b.ts;
+        case 'score-desc': return (a, b) => (Number(b.total) || 0) - (Number(a.total) || 0) || byClassSeat(a, b);
+        default: return byClassSeat;
+      }
     }
 
     function verdictHtml(v) {
@@ -3472,7 +3536,7 @@
     }
 
     function renderAdminTable() {
-      const list = adminFilter().sort(byClassSeat);
+      const list = adminFilter().sort(adminSorter());
       const visible = new Set(list.map(a => a.id));
       [...admin.selected].forEach(id => { if (!visible.has(id)) admin.selected.delete(id); });
 
@@ -3682,14 +3746,24 @@
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
       const lesson = document.getElementById('ad-lesson').value || admin.book || '全部版本';
-      const cls = document.getElementById('ad-cls').value || '全部班級';
+      const cls = document.getElementById('ad-cls').value || (admin.dept ? admin.dept : '全部班級');
       a.download = `朗讀測驗成績_${lesson}_${cls}.csv`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     }
 
     function bindAdmin() {
-      ['ad-lesson', 'ad-cls', 'ad-status'].forEach(id => document.getElementById(id).addEventListener('change', renderAdminTable));
+      ['ad-cls', 'ad-status', 'ad-sort'].forEach(id => document.getElementById(id).addEventListener('change', renderAdminTable));
+      document.getElementById('ad-lesson').addEventListener('change', () => { fillClassSelect(); renderAdminTable(); });
+      document.getElementById('ad-depts').addEventListener('click', e => {
+        const b = e.target.closest('[data-dept-filter]');
+        if (!b) return;
+        admin.dept = b.dataset.deptFilter;
+        renderDeptChips();
+        document.getElementById('ad-cls').value = '';
+        fillClassSelect();
+        renderAdminTable();
+      });
       document.getElementById('ad-books').addEventListener('click', e => {
         const b = e.target.closest('[data-book]');
         if (!b) return;
@@ -3697,6 +3771,7 @@
         renderBookChips();
         fillLessonSelect();
         document.getElementById('ad-lesson').value = '';
+        fillClassSelect();
         renderAdminTable();
       });
       MOBILE.addEventListener('change', () => { if (admin.attempts.length) renderAdminTable(); });
