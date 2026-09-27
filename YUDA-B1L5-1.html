@@ -1564,6 +1564,61 @@
       color: var(--yellow);
     }
 
+    /* 班級鈕、座號鈕：同一種格線，欄寬平均佔滿，尺寸全部一致（欄數由網頁依螢幕寬度設定 --cols） */
+    .pick-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--cols, 10), minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .pick-grid + .pick-grid {
+      margin-top: 14px;
+    }
+
+    .chip.pick {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-width: 0;
+      height: 2.6em;
+      padding: 0 2px;
+      font-size: 0.95em;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .chip.pick:hover {
+      filter: brightness(0.94);
+    }
+
+    /* 同一部別內，各組（科別、年級）不同底色 */
+    .chip.pick.tint-0 { background: #fff3b8; }
+    .chip.pick.tint-1 { background: #dbeafe; }
+    .chip.pick.tint-2 { background: #dff3dc; }
+    .chip.pick.tint-3 { background: #fde2e1; }
+    .chip.pick.tint-4 { background: #ede9fe; }
+    .chip.pick.tint-5 { background: #ffe8cc; }
+    .chip.pick.tint-6 { background: #d9f2f0; }
+    .chip.pick.tint-7 { background: #eceff1; }
+
+    .chip.pick.on {
+      background: var(--black);
+      color: var(--yellow);
+      filter: none;
+    }
+
+    @media (max-width: 480px) {
+      .pick-grid {
+        gap: 6px;
+      }
+
+      .chip.pick {
+        font-size: 0.85em;
+        height: 2.5em;
+      }
+    }
+
     .pf-inputs {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -2533,33 +2588,49 @@
 
     /* 部別與班級：學生用點選的，班級名稱才會一致（收件程式也用同一份名單檢查） */
     const range = (prefix, n) => Array.from({ length: n }, (_, i) => prefix + (i + 1));
+    /* blocks：每個 block 是一張獨立的格線（block 之間留間隔）；block 裡的 group 各自一個底色。
+       perRow：這一組每排最多幾個（高中部一排 6 班）；沒設就照格線欄數排滿。 */
     const DEPARTMENTS = [
-      { name: '高中部', groups: [['高一', range('高一', 12)]] },
-      { name: '技高部', groups: [['商二', range('商二', 4)], ['餐二', range('餐二', 3)], ['廣二', range('廣二', 3)],
-        ['美二', range('美二', 2)], ['英二', range('英二', 2)], ['訊二', range('訊二', 2)], ['子二', range('子二', 2)],
-        ['觀二', range('觀二', 1)]] },
-      { name: '國中部', groups: [['國一', range('國一', 20)], ['國二', range('國二', 20)]] },
-      { name: '國際部', groups: [['', ['701', '702', '1001', '1002']]] }
+      { name: '高中部', blocks: [[{ classes: range('高一', 12), perRow: 6 }]] },
+      { name: '技高部', blocks: [[
+        { classes: range('商二', 4) }, { classes: range('餐二', 3) }, { classes: range('廣二', 3) },
+        { classes: range('美二', 2) }, { classes: range('英二', 2) }, { classes: range('訊二', 2) },
+        { classes: range('子二', 2) }, { classes: range('觀二', 1) }]] },
+      { name: '國中部', blocks: [[{ classes: range('國一', 20) }], [{ classes: range('國二', 20) }]] },
+      { name: '國際部', blocks: [[{ classes: ['701', '702'] }, { classes: ['1001', '1002'] }]] }
     ];
     const SEAT_MAX = 50;
     const pf = { dept: '', cls: '', seat: '' };
+    // 班級鈕與座號鈕共用同一種格線：寬螢幕一排 10 格、窄螢幕一排 5 格，按鈕尺寸因此全部一致
+    const NARROW = window.matchMedia('(max-width: 820px)');
+    const gridCols = () => (NARROW.matches ? 5 : 10);
 
     function deptOfClass(cls) {
-      const d = DEPARTMENTS.find(d => d.groups.some(g => g[1].includes(cls)));
+      const d = DEPARTMENTS.find(d => d.blocks.some(b => b.some(g => g.classes.includes(cls))));
       return d ? d.name : '';
     }
 
     function renderProfileChips() {
+      const cols = gridCols();
       document.getElementById('pf-dept').innerHTML = DEPARTMENTS.map(d =>
         `<button type="button" class="chip${pf.dept === d.name ? ' on' : ''}" data-dept="${d.name}">${d.name}</button>`).join('');
       const dept = DEPARTMENTS.find(d => d.name === pf.dept);
+      let tint = 0;
       document.getElementById('pf-classes').innerHTML = dept
-        ? dept.groups.map(([, list]) => '<div class="pf-group">' +
-            list.map(c => `<button type="button" class="chip${pf.cls === c ? ' on' : ''}" data-cls="${c}">${c}</button>`).join('') +
-          '</div>').join('')
+        ? dept.blocks.map(block => `<div class="pick-grid" style="--cols:${cols}">` +
+            block.map(g => {
+              const t = tint++;
+              const per = g.perRow ? Math.min(g.perRow, cols) : 0;
+              return g.classes.map((c, i) =>
+                `<button type="button" class="chip pick tint-${t}${pf.cls === c ? ' on' : ''}" data-cls="${c}"` +
+                (per && i % per === 0 ? ' style="grid-column-start:1"' : '') + `>${c}</button>`).join('');
+            }).join('') + '</div>').join('')
         : '<span class="hint">請先點選部別</span>';
-      document.getElementById('pf-seats').innerHTML = Array.from({ length: SEAT_MAX }, (_, i) => String(i + 1)).map(n =>
-        `<button type="button" class="chip${pf.seat === n ? ' on' : ''}" data-seat="${n}">${n}</button>`).join('');
+      const seats = document.getElementById('pf-seats');
+      seats.className = 'pick-grid';
+      seats.style.setProperty('--cols', cols);
+      seats.innerHTML = Array.from({ length: SEAT_MAX }, (_, i) => String(i + 1)).map(n =>
+        `<button type="button" class="chip pick${pf.seat === n ? ' on' : ''}" data-seat="${n}">${n}</button>`).join('');
       document.getElementById('pf-picked').textContent =
         pf.cls || pf.seat ? `已選：${pf.cls || '（未選班級）'}　${pf.seat ? pf.seat + ' 號' : '（未選座號）'}` : '';
     }
@@ -3672,6 +3743,9 @@
     document.getElementById('btn-bar-admin').addEventListener('click', leaveQuizToAdmin);
     document.getElementById('profile-form').addEventListener('submit', saveProfile);
     document.getElementById('profile-form').addEventListener('click', onProfileChipClick);
+    NARROW.addEventListener('change', () => {
+      if (!document.getElementById('quiz-profile').classList.contains('hidden')) renderProfileChips();
+    });
     document.getElementById('pf-cancel').addEventListener('click', () => {
       if (quiz.isTeacher && !document.getElementById('quiz-intro').dataset.seen) showTeacherChoice();
       else showIntro();
