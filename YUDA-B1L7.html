@@ -2554,7 +2554,7 @@
         `<button type="button" class="chip${pf.dept === d.name ? ' on' : ''}" data-dept="${d.name}">${d.name}</button>`).join('');
       const dept = DEPARTMENTS.find(d => d.name === pf.dept);
       document.getElementById('pf-classes').innerHTML = dept
-        ? dept.groups.map(([label, list]) => `<div class="pf-group">${label ? `<span class="pf-group-label">${label}</span>` : ''}` +
+        ? dept.groups.map(([, list]) => '<div class="pf-group">' +
             list.map(c => `<button type="button" class="chip${pf.cls === c ? ' on' : ''}" data-cls="${c}">${c}</button>`).join('') +
           '</div>').join('')
         : '<span class="hint">請先點選部別</span>';
