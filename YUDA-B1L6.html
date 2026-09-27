@@ -1442,6 +1442,40 @@
       line-height: 1.2;
     }
 
+    .hist-list {
+      margin: 10px 0 4px;
+    }
+
+    .hist-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .hist-flag {
+      color: #b3261e;
+      font-weight: bold;
+    }
+
+    .hist-score {
+      font-size: 2em;
+      font-weight: bold;
+      white-space: nowrap;
+      line-height: 1;
+    }
+
+    .hist-score span {
+      font-size: 0.45em;
+      margin-left: 2px;
+      color: #555;
+    }
+
     .history-table {
       width: 100%;
       border-collapse: collapse;
@@ -1914,7 +1948,7 @@
      <div class="mode-grid">
       <button class="mode-btn" id="mode-student" type="button">
        <span class="mode-icon">🎤</span><b>學生模式</b>
-       <span class="hint">實際作答本課測驗，成績與錄音會記錄在系統（班級欄為「教師」）</span>
+       <span class="hint">跟學生一樣點選班級、座號後作答，成績與錄音會記錄在系統</span>
       </button>
       <button class="mode-btn" id="mode-admin" type="button">
        <span class="mode-icon">🛠️</span><b>教師管理</b>
@@ -1968,7 +2002,7 @@
      <div class="quiz-actions">
       <button class="qbtn" id="btn-start">開始作答</button>
       <button class="qbtn light" id="btn-history">📋 我的成績</button>
-      <button class="qbtn light" id="btn-edit-profile">✏️ 修改資料</button>
+      <button class="qbtn light" id="btn-edit-profile">✏️ 修改班級座號</button>
       <button class="qbtn light" id="btn-switch">換帳號</button>
       <button class="qbtn light hidden" id="btn-back-admin">🛠️ 切換教師管理</button>
      </div>
@@ -1983,8 +2017,8 @@
       <select id="ad-cls" aria-label="班級"></select>
       <select id="ad-status" aria-label="狀態">
        <option value="">全部紀錄</option>
-       <option value="suspected">疑似播放</option>
-       <option value="unreviewed">疑似播放且未審查</option>
+       <option value="suspected">可疑音檔</option>
+       <option value="unreviewed">可疑音檔且未審查</option>
        <option value="cheat">判定作弊</option>
        <option value="retest">需重測</option>
       </select>
@@ -2583,7 +2617,7 @@
       try {
         const d = await api(body);
         quiz.profile = d.profile;
-        if (quiz.isTeacher) showAdmin(); else showIntro();
+        showIntro();
       } catch (err) {
         msg.textContent = '⚠️ ' + (err.message || err);
       } finally {
@@ -2593,14 +2627,18 @@
 
     function showIntro() {
       const p = quiz.profile || {};
-      const extra = quiz.isTeacher
-        ? '<div class="hint" style="margin-left:auto"><b>教師自測</b>（成績會記錄在系統，班級欄為「教師」）</div>'
-        : p.cls ? `<div class="hint" style="margin-left:auto">班級 <b>${escapeHtml(p.cls)}</b>　座號 <b>${escapeHtml(p.seat)}</b>　${escapeHtml(p.name)}</div>` : '';
+      const extra = p.cls ? `<div class="hint" style="margin-left:auto">班級 <b>${escapeHtml(p.cls)}</b>　座號 <b>${escapeHtml(p.seat)}</b>　${escapeHtml(p.name)}` +
+        (quiz.isTeacher ? '<br><b>教師以學生身分測試</b>（成績與錄音會記錄在系統）' : '') + '</div>' : '';
       document.getElementById('quiz-user').innerHTML = userBadgeHtml(extra);
       document.getElementById('intro-count').textContent = allSentences.length;
+      document.getElementById('quiz-intro').dataset.seen = '1';
       document.getElementById('btn-back-admin').classList.toggle('hidden', !quiz.isTeacher);
-      document.getElementById('btn-edit-profile').classList.toggle('hidden', quiz.isTeacher);
       showSection('quiz-intro');
+    }
+
+    /* 教師切到學生模式：跟學生一樣先點選班級、座號（帶入上次選的），再進測驗說明 */
+    function enterStudentMode() {
+      showProfileForm(true);
     }
 
     /* ===================== 課文呈現（測驗版：只有 🔊 聽一次 與 🎤 錄音） ===================== */
@@ -3156,7 +3194,7 @@
           <div>這是你第 <b>${data.attempt}</b> 次作答</div>
           <div class="big-score">${data.total} 分</div>
           <div>目前最高分：<b>${data.best}</b> 分</div>
-          ${flagged ? `<div class="replay-flag">有 ${flagged} 句被標記為疑似播放範例音，老師會聽錄音複查。</div>` : ''}
+          ${flagged ? `<div class="replay-flag">有 ${flagged} 句被標記為可疑音檔（跟範例音幾乎一樣），老師會聽錄音複查。</div>` : ''}
           <div class="quiz-actions">
             <button class="qbtn" id="btn-again">🔁 再測一次</button>
             <button class="qbtn light" id="btn-history2">📋 我的成績</button>
@@ -3197,14 +3235,21 @@
       openModal('<h3>📋 我的成績</h3><div>讀取中…</div>');
       try {
         const data = await api({ action: 'history', lesson: QUIZ_CONFIG.lesson });
-        const rows = data.attempts.map(a => `
-          <tr><td>${a.attempt}</td><td>${escapeHtml(a.time)}</td><td><b>${a.total}</b></td><td>${a.suspected ? '⚠️ ' + a.suspected : ''}</td><td>${escapeHtml(a.verdict || '')}</td></tr>`).join('');
+        const best = data.attempts.filter(a => a.verdict !== '判定作弊').reduce((m, a) => Math.max(m, Number(a.total) || 0), 0);
+        const items = data.attempts.slice().reverse().map(a => `
+          <div class="hist-item">
+            <div class="hist-main">
+              <div><b>第 ${a.attempt} 次</b></div>
+              <div class="hint">${escapeHtml(a.time)}</div>
+              ${a.suspected ? `<div class="hist-flag">⚠️ 可疑音檔 ${a.suspected} 句</div>` : ''}
+              ${a.verdict ? `<div>老師審查：${verdictHtml(a.verdict)}</div>` : ''}
+            </div>
+            <div class="hist-score">${a.total}<span>分</span></div>
+          </div>`).join('');
         openModal(`
-          <h3>📋 我的成績（${escapeHtml(QUIZ_CONFIG.lesson)}）</h3>
-          ${data.attempts.length ? `
-            <table class="history-table">
-              <tr><th>次數</th><th>時間</th><th>總分</th><th>疑似播放</th><th>老師審查</th></tr>${rows}
-            </table>` : '<div>還沒有作答紀錄。</div>'}
+          <h3>📋 我的成績</h3>
+          <div class="hint">${escapeHtml(LESSON.book)} ${escapeHtml(LESSON.title)}${data.attempts.length ? `｜共 ${data.attempts.length} 次，最高 <b>${best}</b> 分` : ''}</div>
+          ${data.attempts.length ? `<div class="hist-list">${items}</div>` : '<div>還沒有作答紀錄。</div>'}
           <div class="quiz-actions"><button class="qbtn light" id="btn-close">關閉</button></div>`);
       } catch (err) {
         openModal(`<h3>📋 我的成績</h3><div>讀取失敗：${escapeHtml(String(err.message || err))}</div>
@@ -3373,7 +3418,7 @@
               <div>
                 <div><b>${escapeHtml(a.cls)}${a.seat ? '-' + escapeHtml(a.seat) : ''} ${escapeHtml(a.name)}</b> <span class="hint">第 ${a.attempt} 次</span></div>
                 <div class="hint">${escapeHtml(a.time)}｜${escapeHtml(lessonShort(a.lesson))}</div>
-                <div>${a.suspected > 0 ? `<b>⚠️ 疑似播放 ${a.suspected} 句</b>　` : ''}${verdictHtml(a.verdict)}</div>
+                <div>${a.suspected > 0 ? `<b>⚠️ 可疑音檔 ${a.suspected} 句</b>　` : ''}${verdictHtml(a.verdict)}</div>
               </div>
               <div class="ad-card-side"><div class="ad-card-score">${a.total}</div>${reviewBtn(a)}</div>
             </div>`).join('') || '<div class="hint">沒有符合條件的紀錄</div>');
@@ -3390,7 +3435,7 @@
         html = `<table class="admin-table">
           <tr><th><input type="checkbox" id="ad-all" ${allChecked}></th>
             <th>時間</th><th>班級</th><th>座號</th><th>姓名</th><th>課次</th><th>次</th><th>總分</th>
-            <th>疑似播放</th><th>聽範例</th><th>離開頁面</th><th>審查</th><th></th></tr>` +
+            <th>可疑音檔</th><th>聽範例</th><th>離開頁面</th><th>審查</th><th></th></tr>` +
           (rows || '<tr><td colspan="13">沒有符合條件的紀錄</td></tr>') + '</table>';
       }
       document.getElementById('ad-list').innerHTML = html;
@@ -3428,12 +3473,12 @@
         if (MOBILE.matches) {
           return `<div class="rv-item ${rp.suspected ? 'suspect' : ''}">
             <div class="rv-head"><span><b>#${det.seq + 1}</b> ${text}</span><b>${det.total} 分</b></div>
-            <div>${rp.suspected ? '<b>⚠️ 疑似播放</b>　' : ''}<span class="hint">聽範例 ${det.listens || 0}</span></div>
+            <div>${rp.suspected ? '<b>⚠️ 可疑音檔</b>　' : ''}<span class="hint">聽範例 ${det.listens || 0}</span></div>
             ${metrics}<div class="rv-btns">${btns}</div></div>`;
         }
         return `<tr class="${rp.suspected ? 'suspect' : ''}">
           <td>${det.seq + 1}</td><td>${text}</td><td><b>${det.total}</b></td>
-          <td>${rp.suspected ? '<b>⚠️ 疑似播放</b>' : ''}${metrics}</td>
+          <td>${rp.suspected ? '<b>⚠️ 可疑音檔</b>' : ''}${metrics}</td>
           <td>聽範例 ${det.listens || 0}</td>
           <td>${btns}</td>
         </tr>`;
@@ -3558,7 +3603,7 @@
         if (a.suspected > 0) m.suspected++;
         m.cls = a.cls; m.seat = a.seat; m.name = a.name;
       });
-      const head = ['班級', '座號', '姓名', 'Email', '課次', '作答次數', '最高分', '最近一次分數', '最近作答時間', '疑似播放次數', '判定作弊次數'];
+      const head = ['班級', '座號', '姓名', 'Email', '課次', '作答次數', '最高分', '最近一次分數', '最近作答時間', '可疑音檔次數', '判定作弊次數'];
       const rows = Object.values(map).sort(byClassSeat).map(m =>
         [m.cls, m.seat, m.name, m.email, m.lesson, m.count, m.best, m.latest, m.time, m.suspected, m.cheat]);
       const esc = v => /[",\n]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : String(v);
@@ -3584,13 +3629,13 @@
         renderAdminTable();
       });
       MOBILE.addEventListener('change', () => { if (admin.attempts.length) renderAdminTable(); });
-      document.getElementById('mode-student').addEventListener('click', showIntro);
+      document.getElementById('mode-student').addEventListener('click', enterStudentMode);
       document.getElementById('mode-admin').addEventListener('click', showAdmin);
       document.getElementById('ad-search').addEventListener('input', renderAdminTable);
       document.getElementById('ad-refresh').addEventListener('click', loadAdmin);
       document.getElementById('ad-csv').addEventListener('click', downloadCsv);
       document.getElementById('ad-delete').addEventListener('click', () => confirmDelete([...admin.selected]));
-      document.getElementById('ad-student').addEventListener('click', showIntro);
+      document.getElementById('ad-student').addEventListener('click', enterStudentMode);
       document.getElementById('btn-back-admin').addEventListener('click', showAdmin);
 
       const table = document.getElementById('ad-list');
@@ -3628,7 +3673,8 @@
     document.getElementById('profile-form').addEventListener('submit', saveProfile);
     document.getElementById('profile-form').addEventListener('click', onProfileChipClick);
     document.getElementById('pf-cancel').addEventListener('click', () => {
-      if (quiz.isTeacher) showAdmin(); else showIntro();
+      if (quiz.isTeacher && !document.getElementById('quiz-intro').dataset.seen) showTeacherChoice();
+      else showIntro();
     });
     bindAdmin();
     document.getElementById('btn-submit').addEventListener('click', () => {
