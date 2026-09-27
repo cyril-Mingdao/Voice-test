@@ -797,6 +797,21 @@
       align-items: center;
     }
 
+    /* 開始測驗：另開視窗到朗讀線上測驗（嵌在 Google Sites 裡也要另開，Google 登入才能運作） */
+    .pbtn.quiz-link {
+      background: var(--yellow);
+      color: var(--black);
+      border-color: var(--yellow);
+      font-weight: bold;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .pbtn.quiz-link:hover {
+      background: #ffffff;
+      color: var(--black);
+    }
+
     .pbtn.hidden {
       display: none;
     }
@@ -1579,6 +1594,195 @@
       flex: 1 1 180px;
     }
 
+    .admin-toolbar select,
+    .admin-toolbar input {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    #ad-lesson {
+      flex: 2 1 260px;
+    }
+
+    .admin-books {
+      margin: 10px 0 4px;
+    }
+
+    /* ===== 教師登入：選模式 ===== */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 10px 0 14px;
+    }
+
+    .mode-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      text-align: left;
+      font: inherit;
+      padding: 16px 18px;
+      border: 2px solid var(--black);
+      border-radius: 16px;
+      background: #ffffff;
+      color: var(--black);
+      cursor: pointer;
+    }
+
+    .mode-btn:hover {
+      background: var(--yellow-soft);
+    }
+
+    .mode-btn b {
+      font-size: 1.2em;
+    }
+
+    .mode-icon {
+      font-size: 1.8em;
+      line-height: 1;
+    }
+
+    /* ===== 管理頁：手機版卡片 ===== */
+    .ad-all-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0 10px;
+      font-size: 0.95em;
+    }
+
+    .ad-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .ad-card.suspect {
+      background: #fff1f0;
+    }
+
+    .ad-card.cheat {
+      background: #f9d3d0;
+    }
+
+    .ad-card input[type=checkbox] {
+      width: 20px;
+      height: 20px;
+    }
+
+    .ad-card-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ad-card-score {
+      font-size: 1.6em;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    .rv-item {
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      font-size: 0.92em;
+    }
+
+    .rv-item.suspect {
+      background: #fff1f0;
+    }
+
+    .rv-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .rv-btns {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 640px) {
+      .quiz-card {
+        padding: 16px 14px;
+        font-size: 1em;
+      }
+
+      .mode-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-toolbar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      #ad-lesson,
+      #ad-search {
+        grid-column: 1 / -1;
+      }
+
+      .admin-panel .quiz-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .admin-panel .quiz-actions .qbtn {
+        padding: 8px 6px;
+        font-size: 0.9em;
+      }
+
+      .admin-books .chip {
+        flex: 1 1 auto;
+      }
+
+      .quiz-modal {
+        padding: 6px;
+      }
+
+      .quiz-modal .quiz-card {
+        max-height: 94vh;
+      }
+
+      .quiz-user img {
+        width: 36px;
+        height: 36px;
+      }
+
+      /* 手機上 🔊／🎤 要夠大，手指才按得準 */
+      .listen-btn,
+      .mic-btn {
+        width: 2.1em;
+        height: 2.1em;
+        font-size: 0.8em;
+        margin-right: 6px;
+      }
+
+      .quiz-bar {
+        gap: 8px 12px;
+        padding: 10px 12px;
+      }
+
+      .quiz-bar .qbtn {
+        padding: 8px 14px;
+      }
+    }
+
     .qbtn.danger {
       background: #b3261e;
       border-color: #b3261e;
@@ -1704,6 +1908,22 @@
      <div class="hint" id="gate-msg">登入按鈕沒出現？請確認網路連線，並用電腦版 Chrome 或 Edge 開啟本頁。</div>
     </section>
 
+    <section class="quiz-card hidden" id="teacher-choice">
+     <div class="quiz-user" id="choice-user"></div>
+     <h3>請選擇模式</h3>
+     <div class="mode-grid">
+      <button class="mode-btn" id="mode-student" type="button">
+       <span class="mode-icon">🎤</span><b>學生模式</b>
+       <span class="hint">實際作答本課測驗，成績與錄音會記錄在系統（班級欄為「教師」）</span>
+      </button>
+      <button class="mode-btn" id="mode-admin" type="button">
+       <span class="mode-icon">🛠️</span><b>教師管理</b>
+       <span class="hint">檢核錄音、審查結果、刪除資料、下載成績</span>
+      </button>
+     </div>
+     <div class="hint">其他課次：<a href="index.html">回課次列表</a></div>
+    </section>
+
     <section class="quiz-card hidden" id="quiz-profile">
      <h3>請填寫基本資料</h3>
      <div class="hint">成績會依班級、座號彙整給老師，請點選正確的部別、班級與座號。之後可以在測驗說明頁修改。</div>
@@ -1750,13 +1970,14 @@
       <button class="qbtn light" id="btn-history">📋 我的成績</button>
       <button class="qbtn light" id="btn-edit-profile">✏️ 修改資料</button>
       <button class="qbtn light" id="btn-switch">換帳號</button>
-      <button class="qbtn light hidden" id="btn-back-admin">🛠️ 回管理頁</button>
+      <button class="qbtn light hidden" id="btn-back-admin">🛠️ 切換教師管理</button>
      </div>
     </section>
 
     <section class="quiz-card admin-panel hidden" id="admin-panel">
      <div class="quiz-user" id="admin-user"></div>
      <h3>🛠️ 教師管理</h3>
+     <div class="chip-row admin-books" id="ad-books" aria-label="版本"></div>
      <div class="admin-toolbar">
       <select id="ad-lesson" aria-label="課次"></select>
       <select id="ad-cls" aria-label="班級"></select>
@@ -1773,12 +1994,10 @@
       <button class="qbtn light" id="ad-refresh">🔄 重新整理</button>
       <button class="qbtn light" id="ad-csv">⬇️ 下載成績 CSV</button>
       <button class="qbtn danger" id="ad-delete" disabled>🗑️ 刪除勾選</button>
-      <button class="qbtn" id="ad-student">📝 教師自測</button>
+      <button class="qbtn" id="ad-student">🎤 切換學生模式</button>
      </div>
      <div class="hint" id="ad-count"></div>
-     <div class="admin-table-wrap">
-      <table class="admin-table" id="ad-table"></table>
-     </div>
+     <div class="admin-table-wrap" id="ad-list"></div>
     </section>
 
     <div id="content-area" class="hidden"></div>
@@ -1788,7 +2007,7 @@
   <div class="quiz-bar hidden" id="quiz-bar">
    <span class="progress" id="quiz-progress"></span>
    <button class="qbtn" id="btn-submit" disabled>送出成績</button>
-   <button class="qbtn hidden" id="btn-bar-admin">🛠️ 回管理頁</button>
+   <button class="qbtn hidden" id="btn-bar-admin">🛠️ 教師管理</button>
   </div>
 
   <div class="quiz-modal hidden" id="quiz-modal">
@@ -1797,7 +2016,7 @@
 
   <script>
     const LESSON = {"id": "YUDA-B1L3", "book": "育達全1冊", "title": "第3課 山裡的英雄", "subtitle": "育達版高中全1冊 第3課 山裡的英雄", "credit": "音檔來源：育達文化事業股份有限公司（經授權使用）", "refBase": "https://cyril-mingdao.github.io/pen/YUDA-B1L3/", "pages": [{"page": "34", "sentences": [{"html": "<ruby><span class=\"rb\">阿慧<\/span><rt>A-huī<\/rt><\/ruby><ruby><span class=\"rb\">是<\/span><rt>sī<\/rt><\/ruby><ruby><span class=\"rb\">一<\/span><rt>tsi̍t<\/rt><\/ruby><ruby><span class=\"rb\">个<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">生做<\/span><rt>senn-tsò<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">細粒子<\/span><rt>sè-lia̍p-tsí<\/rt><\/ruby>、<\/span><ruby><span class=\"rb\">皮膚<\/span><rt>phuê-hu<\/rt><\/ruby><ruby><span class=\"rb\">予<\/span><rt>hōo<\/rt><\/ruby><ruby><span class=\"rb\">日頭<\/span><rt>ji̍t-thâu<\/rt><\/ruby><ruby><span class=\"rb\">曝<\/span><rt>pha̍k<\/rt><\/ruby><ruby><span class=\"rb\">甲<\/span><rt>kah<\/rt><\/ruby><ruby><span class=\"rb\">烏金<\/span><rt>oo-kim<\/rt><\/ruby><ruby><span class=\"rb\">烏金<\/span><rt>oo-kim<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">巡山員<\/span><rt>sûn-suann-uân<\/rt><\/ruby>。<\/span>", "text": "阿慧是一个生做細粒子、皮膚予日頭曝甲烏金烏金的巡山員。"}, {"html": "<ruby><span class=\"rb\">伊<\/span><rt>I<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">面仔<\/span><rt>bīn-á<\/rt><\/ruby><ruby><span class=\"rb\">總是<\/span><rt>tsóng-sī<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">笑微微<\/span><rt>tshiò-bi-bi<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">看<\/span><rt>khuànn<\/rt><\/ruby><ruby><span class=\"rb\">會<\/span><rt>ē<\/rt><\/ruby><ruby><span class=\"rb\">著<\/span><rt>tio̍h<\/rt><\/ruby><ruby><span class=\"rb\">古錐<\/span><rt>kóo-tsui<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">酒窟仔<\/span><rt>tsiú-khut-á<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">用<\/span><rt>iōng<\/rt><\/ruby><ruby><span class=\"rb\">親切<\/span><rt>tshin-tshiat<\/rt><\/ruby><ruby><span class=\"rb\">閣<\/span><rt>koh<\/rt><\/ruby><ruby><span class=\"rb\">響亮<\/span><rt>hiáng-liāng<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">聲音<\/span><rt>siann-im<\/rt><\/ruby><ruby><span class=\"rb\">共<\/span><rt>kā<\/rt><\/ruby><ruby><span class=\"rb\">遊客<\/span><rt>iû-kheh<\/rt><\/ruby><ruby><span class=\"rb\">紹介<\/span><rt>siāu-kài<\/rt><\/ruby><ruby><span class=\"rb\">陽明山<\/span><rt>Iûnn-bîng-suann<\/rt><\/ruby><ruby><span class=\"rb\">國家<\/span><rt>Kok-ka<\/rt><\/ruby><ruby><span class=\"rb\">公園<\/span><rt>Kong-hn̂g<\/rt><\/ruby><ruby><span class=\"rb\">內底<\/span><rt>lāi-té<\/rt><\/ruby><ruby><span class=\"rb\">特有<\/span><rt>ti̍k-iú<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">動物<\/span><rt>tōng-bu̍t<\/rt><\/ruby><ruby><span class=\"rb\">佮<\/span><rt>kah<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">植物<\/span><rt>si̍t-bu̍t<\/rt><\/ruby>。<\/span>", "text": "伊的面仔總是笑微微，看會著古錐的酒窟仔，用親切閣響亮的聲音共遊客紹介陽明山國家公園內底特有的動物佮植物。"}, {"html": "<ruby><span class=\"rb\">伊<\/span><rt>I<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">講<\/span><rt>kóng<\/rt><\/ruby>：<\/span><span class=\"nobr\">「<ruby><span class=\"rb\">這<\/span><rt>Tsit<\/rt><\/ruby><\/span><ruby><span class=\"rb\">片<\/span><rt>phiàn<\/rt><\/ruby><ruby><span class=\"rb\">山林<\/span><rt>suann-nâ<\/rt><\/ruby><ruby><span class=\"rb\">是<\/span><rt>sī<\/rt><\/ruby><ruby><span class=\"rb\">天公伯仔<\/span><rt>thinn-kong-peh-á<\/rt><\/ruby><ruby><span class=\"rb\">賜<\/span><rt>sù<\/rt><\/ruby><ruby><span class=\"rb\">予<\/span><rt>hōo<\/rt><\/ruby><ruby><span class=\"rb\">咱<\/span><rt>lán<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">禮物<\/span><rt>lé-bu̍t<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">咱<\/span><rt>lán<\/rt><\/ruby><ruby><span class=\"rb\">愛<\/span><rt>ài<\/rt><\/ruby><ruby><span class=\"rb\">會曉<\/span><rt>ē-hiáu<\/rt><\/ruby><ruby><span class=\"rb\">共<\/span><rt>kā<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">尊重<\/span><rt>tsun-tiōng<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">大自然<\/span><rt>tāi-tsū-jiân<\/rt><\/ruby><ruby><span class=\"rb\">才<\/span><rt>tsiah<\/rt><\/ruby><ruby><span class=\"rb\">會<\/span><rt>ē<\/rt><\/ruby><ruby><span class=\"rb\">久長<\/span><rt>kú-tn̂g<\/rt><\/ruby><ruby><span class=\"rb\">生<\/span><rt>senn<\/rt><\/ruby><ruby><span class=\"rb\">湠<\/span><rt>thuànn<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">落去<\/span><rt>lo̍h-khì<\/rt><\/ruby>。」<\/span>", "text": "伊講：「這片山林是天公伯仔賜予咱的禮物，咱愛會曉共尊重，大自然才會久長生湠落去。」"}, {"html": "<ruby><span class=\"rb\">這<\/span><rt>Tsit<\/rt><\/ruby><ruby><span class=\"rb\">个<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">好笑神<\/span><rt>hó-tshiò-sîn<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">查某囡仔<\/span><rt>tsa-bóo-gín-á<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">揹<\/span><rt>phāinn<\/rt><\/ruby><ruby><span class=\"rb\">一<\/span><rt>tsi̍t<\/rt><\/ruby><ruby><span class=\"rb\">跤<\/span><rt>kha<\/rt><\/ruby><ruby><span class=\"rb\">簡單<\/span><rt>kán-tan<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby>kha-báng<ruby><span class=\"rb\">佇<\/span><rt>tī<\/rt><\/ruby><ruby><span class=\"rb\">山林內<\/span><rt>suann-nâ-lāi<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">巡看<\/span><rt>sûn-khuànn<\/rt><\/ruby>，<\/span> <ruby><span class=\"rb\">排除<\/span><rt>pâi-tû<\/rt><\/ruby><ruby><span class=\"rb\">歹人<\/span><rt>pháinn-lâng<\/rt><\/ruby><ruby><span class=\"rb\">設立<\/span><rt>siat-li̍p<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">陷阱<\/span><rt>hām-tsénn<\/rt><\/ruby>、<\/span><ruby><span class=\"rb\">抾<\/span><rt>khioh<\/rt><\/ruby><ruby><span class=\"rb\">別人<\/span><rt>pa̍t-lâng<\/rt><\/ruby><ruby><span class=\"rb\">袂記得<\/span><rt>bē-kì-tit<\/rt><\/ruby><ruby><span class=\"rb\">紮<\/span><rt>tsah<\/rt><\/ruby><ruby><span class=\"rb\">落山<\/span><rt>lo̍h-suann<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">糞埽<\/span><rt>pùn-sò<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">這<\/span><rt>tse<\/rt><\/ruby><ruby><span class=\"rb\">是<\/span><rt>sī<\/rt><\/ruby><ruby><span class=\"rb\">伊<\/span><rt>i<\/rt><\/ruby><ruby><span class=\"rb\">日常<\/span><rt>ji̍t-siông<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">工課<\/span><rt>khang-khuè<\/rt><\/ruby>。<\/span>", "text": "這个好笑神的查某囡仔，揹一跤簡單的kha-báng佇山林內巡看， 排除歹人設立的陷阱、抾別人袂記得紮落山的糞埽，這是伊日常的工課。"}]}, {"page": "35", "sentences": [{"html": "<ruby><span class=\"rb\">有<\/span><rt>Ū<\/rt><\/ruby><ruby><span class=\"rb\">一<\/span><rt>tsi̍t<\/rt><\/ruby><ruby><span class=\"rb\">工<\/span><rt>kang<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">半暝<\/span><rt>puànn-mê<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">一<\/span><rt>tsi̍t<\/rt><\/ruby><ruby><span class=\"rb\">通<\/span><rt>thong<\/rt><\/ruby><ruby><span class=\"rb\">電話<\/span><rt>tiān-uē<\/rt><\/ruby><ruby><span class=\"rb\">共<\/span><rt>kā<\/rt><\/ruby><ruby><span class=\"rb\">睏<\/span><rt>khùn<\/rt><\/ruby><ruby><span class=\"rb\">甲<\/span><rt>kah<\/rt><\/ruby><ruby><span class=\"rb\">當<\/span><rt>tng<\/rt><\/ruby><ruby><span class=\"rb\">落眠<\/span><rt>lo̍h-bîn<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">阿慧<\/span><rt>A-huī<\/rt><\/ruby><ruby><span class=\"rb\">吵<\/span><rt>tshá<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">精神<\/span><rt>tsing-sîn<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">通知<\/span><rt>thong-ti<\/rt><\/ruby><ruby><span class=\"rb\">伊<\/span><rt>i<\/rt><\/ruby><ruby><span class=\"rb\">愛<\/span><rt>ài<\/rt><\/ruby><ruby><span class=\"rb\">去<\/span><rt>khì<\/rt><\/ruby><ruby><span class=\"rb\">執行<\/span><rt>tsip-hîng<\/rt><\/ruby><ruby><span class=\"rb\">特殊<\/span><rt>ti̍k-sû<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">任務<\/span><rt>jīm-bū<\/rt><\/ruby>。<\/span>", "text": "有一工半暝，一通電話共睏甲當落眠的阿慧吵精神，通知伊愛去執行特殊任務。"}, {"html": "<ruby><span class=\"rb\">伊<\/span><rt>I<\/rt><\/ruby><ruby><span class=\"rb\">共<\/span><rt>kā<\/rt><\/ruby><ruby><span class=\"rb\">靴管<\/span><rt>hia-kóng<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">穿咧<\/span><rt>tshīng-leh<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">隨<\/span><rt>suî<\/rt><\/ruby><ruby><span class=\"rb\">騎<\/span><rt>khiâ<\/rt><\/ruby>oo-tóo-bái<ruby><span class=\"rb\">趕去<\/span><rt>kuánn-khì<\/rt><\/ruby><ruby><span class=\"rb\">臨時<\/span><rt>lîm-sî<\/rt><\/ruby><ruby><span class=\"rb\">設立<\/span><rt>siat-li̍p<\/rt><\/ruby><ruby><span class=\"rb\">佇<\/span><rt>tī<\/rt><\/ruby><ruby><span class=\"rb\">山腰<\/span><rt>suann-io<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\">「<ruby><span class=\"rb\">前進<\/span><rt>tsiân-tsìn<\/rt><\/ruby><\/span><span class=\"nobr\"><ruby><span class=\"rb\">指揮所<\/span><rt>tsí-hui-sóo<\/rt><\/ruby>」。<\/span>", "text": "伊共靴管穿咧，隨騎oo-tóo-bái趕去臨時設立佇山腰的「前進指揮所」。"}, {"html": "<ruby><span class=\"rb\">阿慧<\/span><rt>A-huī<\/rt><\/ruby><ruby><span class=\"rb\">一下<\/span><rt>tsi̍t-ē<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">到<\/span><rt>kàu<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">所有<\/span><rt>sóo-ū<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">人<\/span><rt>lâng<\/rt><\/ruby><ruby><span class=\"rb\">隨<\/span><rt>suî<\/rt><\/ruby><ruby><span class=\"rb\">恬靜<\/span><rt>tiām-tsīng<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">落來<\/span><rt>lo̍h-lâi<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">消防<\/span><rt>siau-hông<\/rt><\/ruby><ruby><span class=\"rb\">隊長<\/span><rt>tuī-tiúnn<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">講<\/span><rt>kóng<\/rt><\/ruby>：<\/span><span class=\"nobr\">「<ruby><span class=\"rb\">有<\/span><rt>Ū<\/rt><\/ruby><\/span><ruby><span class=\"rb\">登山客<\/span><rt>ting-san-kheh<\/rt><\/ruby><ruby><span class=\"rb\">佇<\/span><rt>tī<\/rt><\/ruby><ruby><span class=\"rb\">山裡<\/span><rt>suann-lí<\/rt><\/ruby><ruby><span class=\"rb\">揣<\/span><rt>tshuē<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">無<\/span><rt>bô<\/rt><\/ruby><ruby><span class=\"rb\">路<\/span><rt>lōo<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">拜託<\/span><rt>pài-thok<\/rt><\/ruby><ruby><span class=\"rb\">你<\/span><rt>lí<\/rt><\/ruby><ruby><span class=\"rb\">做<\/span><rt>tsò<\/rt><\/ruby><ruby><span class=\"rb\">搜救隊<\/span><rt>soo-kiù-tuī<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">𤆬路人<\/span><rt>tshuā-lōo-lâng<\/rt><\/ruby>。」<\/span>", "text": "阿慧一下到，所有的人隨恬靜落來，消防隊長講：「有登山客佇山裡揣無路，拜託你做搜救隊的𤆬路人。」"}, {"html": "<ruby><span class=\"rb\">這<\/span><rt>Tsit<\/rt><\/ruby><ruby><span class=\"rb\">搭<\/span><rt>tah<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">路草<\/span><rt>lōo-tsháu<\/rt><\/ruby><ruby><span class=\"rb\">無<\/span><rt>bô<\/rt><\/ruby><ruby><span class=\"rb\">人<\/span><rt>lâng<\/rt><\/ruby><ruby><span class=\"rb\">比<\/span><rt>pí<\/rt><\/ruby><ruby><span class=\"rb\">阿慧<\/span><rt>A-huī<\/rt><\/ruby><ruby><span class=\"rb\">閣較<\/span><rt>koh-khah<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">了解<\/span><rt>liáu-kái<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">伊<\/span><rt>i<\/rt><\/ruby><ruby><span class=\"rb\">那<\/span><rt>ná<\/rt><\/ruby><ruby><span class=\"rb\">解說<\/span><rt>kái-sueh<\/rt><\/ruby><ruby><span class=\"rb\">那<\/span><rt>ná<\/rt><\/ruby><ruby><span class=\"rb\">分組<\/span><rt>hun-tsoo<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">時陣<\/span><rt>sî-tsūn<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">外口<\/span><rt>guā-kháu<\/rt><\/ruby><ruby><span class=\"rb\">煞<\/span><rt>suah<\/rt><\/ruby><ruby><span class=\"rb\">開始<\/span><rt>khai-sí<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">落雨<\/span><rt>lo̍h-hōo<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">家屬<\/span><rt>ka-sio̍k<\/rt><\/ruby><ruby><span class=\"rb\">是<\/span><rt>sī<\/rt><\/ruby><ruby><span class=\"rb\">非常<\/span><rt>hui-siông<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">著急<\/span><rt>tio̍h-kip<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">阿慧<\/span><rt>A-huī<\/rt><\/ruby><ruby><span class=\"rb\">評估<\/span><rt>phîng-kóo<\/rt><\/ruby><ruby><span class=\"rb\">隊員<\/span><rt>tuī-uân<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">安全<\/span><rt>an-tsuân<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">了後<\/span><rt>liáu-āu<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">隨<\/span><rt>suî<\/rt><\/ruby><ruby><span class=\"rb\">大聲<\/span><rt>tuā-siann<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">喝<\/span><rt>huah<\/rt><\/ruby>：<\/span><span class=\"nobr\"><span class=\"nobr\">「<ruby><span class=\"rb\">出發<\/span><rt>tshut-huat<\/rt><\/ruby><\/span>！」<\/span>", "text": "這搭的路草無人比阿慧閣較了解，伊那解說那分組的時陣，外口煞開始落雨，家屬是非常著急，阿慧評估隊員的安全了後，隨大聲喝：「出發！」"}]}, {"page": "36", "sentences": [{"html": "<ruby><span class=\"rb\">阿慧<\/span><rt>A-huī<\/rt><\/ruby><ruby><span class=\"rb\">𤆬頭<\/span><rt>tshuā-thâu<\/rt><\/ruby><ruby><span class=\"rb\">向<\/span><rt>ǹg<\/rt><\/ruby><ruby><span class=\"rb\">山林<\/span><rt>suann-nâ<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">起行<\/span><rt>khí-kiânn<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">粗<\/span><rt>tshoo<\/rt><\/ruby><ruby><span class=\"rb\">閣<\/span><rt>koh<\/rt><\/ruby><ruby><span class=\"rb\">重<\/span><rt>tāng<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">雨<\/span><rt>hōo<\/rt><\/ruby><ruby><span class=\"rb\">珠<\/span><rt>tsu<\/rt><\/ruby><ruby><span class=\"rb\">拍<\/span><rt>phah<\/rt><\/ruby><ruby><span class=\"rb\">佇<\/span><rt>tī<\/rt><\/ruby><ruby><span class=\"rb\">𪜶<\/span><rt>in<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">身軀頂<\/span><rt>sin-khu-tíng<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">麻<\/span><rt>bâ<\/rt><\/ruby><ruby><span class=\"rb\">閣<\/span><rt>koh<\/rt><\/ruby><ruby><span class=\"rb\">疼<\/span><rt>thiànn<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">感覺<\/span><rt>kám-kak<\/rt><\/ruby><ruby><span class=\"rb\">若親像<\/span><rt>ná-tshin-tshiūnn<\/rt><\/ruby><ruby><span class=\"rb\">咧<\/span><rt>leh<\/rt><\/ruby><ruby><span class=\"rb\">提醒<\/span><rt>thê-tshénn<\/rt><\/ruby><ruby><span class=\"rb\">咱<\/span><rt>lán<\/rt><\/ruby><ruby><span class=\"rb\">毋通<\/span><rt>m̄-thang<\/rt><\/ruby><ruby><span class=\"rb\">袂記得<\/span><rt>bē-kì-tit<\/rt><\/ruby><ruby><span class=\"rb\">大自然<\/span><rt>tāi-tsū-jiân<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">力量<\/span><rt>li̍k-liōng<\/rt><\/ruby>。<\/span>", "text": "阿慧𤆬頭向山林起行，粗閣重的雨珠拍佇𪜶的身軀頂，麻閣疼的感覺若親像咧提醒咱毋通袂記得大自然的力量。"}, {"html": "<ruby><span class=\"rb\">總是<\/span><rt>Tsóng-sī<\/rt><\/ruby><ruby><span class=\"rb\">風雨<\/span><rt>hong-hōo<\/rt><\/ruby><ruby><span class=\"rb\">愈<\/span><rt>jú<\/rt><\/ruby><ruby><span class=\"rb\">來<\/span><rt>lâi<\/rt><\/ruby><ruby><span class=\"rb\">愈<\/span><rt>jú<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">大<\/span><rt>tuā<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">只好<\/span><rt>tsí-hó<\/rt><\/ruby><ruby><span class=\"rb\">先<\/span><rt>sing<\/rt><\/ruby><ruby><span class=\"rb\">轉去<\/span><rt>tńg-khì<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">指揮所<\/span><rt>tsí-hui-sóo<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">聽候<\/span><rt>thìng-hāu<\/rt><\/ruby><ruby><span class=\"rb\">天光<\/span><rt>thinn-kng<\/rt><\/ruby><ruby><span class=\"rb\">才閣<\/span><rt>tsiah-koh<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">行動<\/span><rt>hîng-tōng<\/rt><\/ruby>。<\/span>", "text": "總是風雨愈來愈大，只好先轉去指揮所，聽候天光才閣行動。"}, {"html": "<ruby><span class=\"rb\">這<\/span><rt>Tsit<\/rt><\/ruby><ruby><span class=\"rb\">个<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">時陣<\/span><rt>sî-tsūn<\/rt><\/ruby><ruby><span class=\"rb\">阿慧<\/span><rt>A-huī<\/rt><\/ruby><ruby><span class=\"rb\">才<\/span><rt>tsiah<\/rt><\/ruby><ruby><span class=\"rb\">欲<\/span><rt>beh<\/rt><\/ruby><ruby><span class=\"rb\">開始<\/span><rt>khai-sí<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">無閒<\/span><rt>bô-îng<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">伊<\/span><rt>i<\/rt><\/ruby><ruby><span class=\"rb\">共<\/span><rt>kā<\/rt><\/ruby><ruby><span class=\"rb\">拄才<\/span><rt>tú-tsiah<\/rt><\/ruby><ruby><span class=\"rb\">每<\/span><rt>muí<\/rt><\/ruby><ruby><span class=\"rb\">一<\/span><rt>tsi̍t<\/rt><\/ruby><ruby><span class=\"rb\">隊<\/span><rt>tuī<\/rt><\/ruby><ruby><span class=\"rb\">行過<\/span><rt>kiânn-kuè<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">路線<\/span><rt>lōo-suànn<\/rt><\/ruby><ruby><span class=\"rb\">佮<\/span><rt>kah<\/rt><\/ruby><ruby><span class=\"rb\">觀測<\/span><rt>kuan-tshik<\/rt><\/ruby><ruby><span class=\"rb\">資料<\/span><rt>tsu-liāu<\/rt><\/ruby><ruby><span class=\"rb\">傳<\/span><rt>thuân<\/rt><\/ruby><ruby><span class=\"rb\">起去<\/span><rt>khí-khì<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">電腦<\/span><rt>tiān-náu<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">透過<\/span><rt>thàu-kuè<\/rt><\/ruby><ruby><span class=\"rb\">衛星圖<\/span><rt>uī-tshenn-tôo<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">比對<\/span><rt>pí-tuì<\/rt><\/ruby>、<\/span><ruby><span class=\"rb\">預測<\/span><rt>ī-tshik<\/rt><\/ruby><ruby><span class=\"rb\">登山客<\/span><rt>ting-san-kheh<\/rt><\/ruby><ruby><span class=\"rb\">可能<\/span><rt>khó-lîng<\/rt><\/ruby><ruby><span class=\"rb\">佇<\/span><rt>tī<\/rt><\/ruby><ruby><span class=\"rb\">啥物<\/span><rt>siánn-mih<\/rt><\/ruby><ruby><span class=\"rb\">所在<\/span><rt>sóo-tsāi<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">失路<\/span><rt>sit-lōo<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">這<\/span><rt>tse<\/rt><\/ruby><ruby><span class=\"rb\">完全<\/span><rt>uân-tsuân<\/rt><\/ruby><ruby><span class=\"rb\">愛<\/span><rt>ài<\/rt><\/ruby><ruby><span class=\"rb\">靠<\/span><rt>khò<\/rt><\/ruby><ruby><span class=\"rb\">平常時<\/span><rt>pîng-siông-sî<\/rt><\/ruby><ruby><span class=\"rb\">巡山<\/span><rt>sûn-suann<\/rt><\/ruby><ruby><span class=\"rb\">粒積<\/span><rt>lia̍p-tsik<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">經驗<\/span><rt>king-giām<\/rt><\/ruby>。<\/span>", "text": "這个時陣阿慧才欲開始無閒，伊共拄才每一隊行過的路線佮觀測資料傳起去電腦，透過衛星圖比對、預測登山客可能佇啥物所在失路，這完全愛靠平常時巡山粒積的經驗。"}, {"html": "<ruby><span class=\"rb\">隔轉工<\/span><rt>Keh-tńg-kang<\/rt><\/ruby><ruby><span class=\"rb\">天<\/span><rt>thinn<\/rt><\/ruby><ruby><span class=\"rb\">拄<\/span><rt>tú<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">拍殕光<\/span><rt>phah-phú-kng<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">雨<\/span><rt>hōo<\/rt><\/ruby><ruby><span class=\"rb\">嘛<\/span><rt>mā<\/rt><\/ruby><ruby><span class=\"rb\">已經<\/span><rt>í-king<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">停矣<\/span><rt>thîng-ah<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">這<\/span><rt>tsit<\/rt><\/ruby><ruby><span class=\"rb\">改<\/span><rt>kái<\/rt><\/ruby><ruby><span class=\"rb\">也<\/span><rt>iā<\/rt><\/ruby><ruby><span class=\"rb\">總算<\/span><rt>tsóng-sǹg<\/rt><\/ruby><ruby><span class=\"rb\">順利<\/span><rt>sūn-lī<\/rt><\/ruby><ruby><span class=\"rb\">救<\/span><rt>kiù<\/rt><\/ruby><ruby><span class=\"rb\">著<\/span><rt>tio̍h<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">人囉<\/span><rt>lâng-looh<\/rt><\/ruby>！<\/span>", "text": "隔轉工天拄拍殕光，雨嘛已經停矣，這改也總算順利救著人囉！"}, {"html": "<ruby><span class=\"rb\">阿慧<\/span><rt>A-huī<\/rt><\/ruby><ruby><span class=\"rb\">佇<\/span><rt>tī<\/rt><\/ruby><ruby><span class=\"rb\">山裡<\/span><rt>suann-lí<\/rt><\/ruby><ruby><span class=\"rb\">搜救<\/span><rt>soo-kiù<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">代誌<\/span><rt>tāi-tsì<\/rt><\/ruby><ruby><span class=\"rb\">時常<\/span><rt>sî-siông<\/rt><\/ruby><ruby><span class=\"rb\">予<\/span><rt>hōo<\/rt><\/ruby><ruby><span class=\"rb\">人<\/span><rt>lâng<\/rt><\/ruby><ruby><span class=\"rb\">共<\/span><rt>kā<\/rt><\/ruby><ruby><span class=\"rb\">寫<\/span><rt>siá<\/rt><\/ruby><ruby><span class=\"rb\">佇<\/span><rt>tī<\/rt><\/ruby><ruby><span class=\"rb\">網路<\/span><rt>bāng-lōo<\/rt><\/ruby><ruby><span class=\"rb\">頂<\/span><rt>tíng<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">分享<\/span><rt>hun-hióng<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">伊<\/span><rt>i<\/rt><\/ruby><ruby><span class=\"rb\">用心<\/span><rt>iōng-sim<\/rt><\/ruby><ruby><span class=\"rb\">守護<\/span><rt>siú-hōo<\/rt><\/ruby><ruby><span class=\"rb\">這<\/span><rt>tsit<\/rt><\/ruby><ruby><span class=\"rb\">片<\/span><rt>phiàn<\/rt><\/ruby><ruby><span class=\"rb\">土地<\/span><rt>thóo-tē<\/rt><\/ruby><ruby><span class=\"rb\">特有<\/span><rt>ti̍k-iú<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><ruby><span class=\"rb\">動物<\/span><rt>tōng-bu̍t<\/rt><\/ruby><ruby><span class=\"rb\">佮<\/span><rt>kah<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">植物<\/span><rt>si̍t-bu̍t<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">嘛<\/span><rt>mā<\/rt><\/ruby><ruby><span class=\"rb\">守護<\/span><rt>siú-hōo<\/rt><\/ruby><ruby><span class=\"rb\">遊客<\/span><rt>iû-kheh<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">安全<\/span><rt>an-tsuân<\/rt><\/ruby>。<\/span>", "text": "阿慧佇山裡搜救的代誌時常予人共寫佇網路頂分享，伊用心守護這片土地特有的動物佮植物，嘛守護遊客的安全。"}, {"html": "<ruby><span class=\"rb\">媒體<\/span><rt>Muî-thé<\/rt><\/ruby><ruby><span class=\"rb\">想<\/span><rt>siūnn<\/rt><\/ruby><ruby><span class=\"rb\">欲<\/span><rt>beh<\/rt><\/ruby><ruby><span class=\"rb\">報導<\/span><rt>pò-tō<\/rt><\/ruby><ruby><span class=\"rb\">阿慧<\/span><rt>A-huī<\/rt><\/ruby><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">故事<\/span><rt>kòo-sū<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">伊<\/span><rt>i<\/rt><\/ruby><ruby><span class=\"rb\">堅持<\/span><rt>kian-tshî<\/rt><\/ruby><ruby><span class=\"rb\">無<\/span><rt>bô<\/rt><\/ruby><ruby><span class=\"rb\">欲<\/span><rt>beh<\/rt><\/ruby><ruby><span class=\"rb\">透露<\/span><rt>thàu-lōo<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">本名<\/span><rt>pún-miâ<\/rt><\/ruby>，<\/span><ruby><span class=\"rb\">所以<\/span><rt>sóo-í<\/rt><\/ruby><ruby><span class=\"rb\">逐家<\/span><rt>ta̍k-ke<\/rt><\/ruby><ruby><span class=\"rb\">就<\/span><rt>tō<\/rt><\/ruby><ruby><span class=\"rb\">共<\/span><rt>kā<\/rt><\/ruby><ruby><span class=\"rb\">伊<\/span><rt>i<\/rt><\/ruby><ruby><span class=\"rb\">號做<\/span><rt>hō-tsò<\/rt><\/ruby><span class=\"nobr\">「<ruby><span class=\"rb\">山裡<\/span><rt>Suann-lí<\/rt><\/ruby><\/span><ruby><span class=\"rb\">的<\/span><rt>ê<\/rt><\/ruby><span class=\"nobr\"><ruby><span class=\"rb\">英雄<\/span><rt>ing-hiông<\/rt><\/ruby>」。<\/span>", "text": "媒體想欲報導阿慧的故事，伊堅持無欲透露本名，所以逐家就共伊號做「山裡的英雄」。"}]}]};
-    const LESSON_CATALOG = [{"id": "YUDA-B1L1", "book": "育達全1冊", "title": "第1課 美食外送", "count": 16}, {"id": "YUDA-B1L2", "book": "育達全1冊", "title": "第2課 茂林的Rukai族佮烏秫米祭", "count": 10}, {"id": "YUDA-B1L3", "book": "育達全1冊", "title": "第3課 山裡的英雄", "count": 14}, {"id": "YUDA-B1L4", "book": "育達全1冊", "title": "第4課 馬偕之路", "count": 28}, {"id": "YUDA-B1L5-1", "book": "育達全1冊", "title": "第5課之1 無字的情批", "count": 21}, {"id": "YUDA-B1L5-2", "book": "育達全1冊", "title": "第5課之2 情批", "count": 22}, {"id": "YUDA-B1L6", "book": "育達全1冊", "title": "第6課 化妝品", "count": 20}, {"id": "YUDA-B1L7", "book": "育達全1冊", "title": "第7課 我的人生，我創造", "count": 20}, {"id": "YUDA-B1L8", "book": "育達全1冊", "title": "第8課 翕相師傅（P.124-135）", "count": 85}, {"id": "CHUANHWA-B3L1", "book": "全華第3冊", "title": "第1課 媠花", "count": 16}, {"id": "CHUANHWA-B3L2", "book": "全華第3冊", "title": "第2課 阮兜這條街", "count": 16}, {"id": "CHUANHWA-B3L3", "book": "全華第3冊", "title": "第3課 一字多音真心適", "count": 10}, {"id": "CHUANHWA-B3L4", "book": "全華第3冊", "title": "第4課 喝玲瑯，踅街路", "count": 27}];
+    const LESSON_CATALOG = [{"id": "YUDA-B1L1", "book": "育達全1冊", "title": "第1課 美食外送", "count": 16}, {"id": "YUDA-B1L2", "book": "育達全1冊", "title": "第2課 茂林的Rukai族佮烏秫米祭", "count": 10}, {"id": "YUDA-B1L3", "book": "育達全1冊", "title": "第3課 山裡的英雄", "count": 14}, {"id": "YUDA-B1L4", "book": "育達全1冊", "title": "第4課 馬偕之路", "count": 28}, {"id": "YUDA-B1L5-1", "book": "育達全1冊", "title": "第5課之1 無字的情批", "count": 21}, {"id": "YUDA-B1L5-2", "book": "育達全1冊", "title": "第5課之2 情批", "count": 22}, {"id": "YUDA-B1L6", "book": "育達全1冊", "title": "第6課 化妝品", "count": 20}, {"id": "YUDA-B1L7", "book": "育達全1冊", "title": "第7課 我的人生，我創造", "count": 20}, {"id": "YUDA-B1L8", "book": "育達全1冊", "title": "第8課 翕相師傅", "count": 85}, {"id": "CHUANHWA-B3L1", "book": "全華第3冊", "title": "第1課 媠花", "count": 16}, {"id": "CHUANHWA-B3L2", "book": "全華第3冊", "title": "第2課 阮兜這條街", "count": 16}, {"id": "CHUANHWA-B3L3", "book": "全華第3冊", "title": "第3課 一字多音真心適", "count": 10}, {"id": "CHUANHWA-B3L4", "book": "全華第3冊", "title": "第4課 喝玲瑯，踅街路", "count": 27}];
 
     function escapeHtml(text) {
       const div = document.createElement('div');
@@ -2249,7 +2468,7 @@
     }
 
     /* 同一時間只顯示一個主要區塊 */
-    const SECTIONS = ['quiz-gate', 'quiz-profile', 'quiz-intro', 'admin-panel'];
+    const SECTIONS = ['quiz-gate', 'teacher-choice', 'quiz-profile', 'quiz-intro', 'admin-panel'];
     function showSection(id) {
       SECTIONS.forEach(s => document.getElementById(s).classList.toggle('hidden', s !== id));
       document.body.classList.toggle('admin-mode', id === 'admin-panel');
@@ -2270,7 +2489,7 @@
         quiz.isTeacher = !!d.isTeacher;
         quiz.profile = d.profile;
         msg.textContent = '';
-        if (quiz.isTeacher) showAdmin();
+        if (quiz.isTeacher) showTeacherChoice();
         else if (!quiz.profile) showProfileForm(false);
         else showIntro();
       } catch (err) {
@@ -2324,6 +2543,13 @@
       }
       document.getElementById('pf-msg').textContent = '';
       renderProfileChips();
+    }
+
+    /* 教師登入後先選：學生模式（實際作答，會記錄）或教師管理 */
+    function showTeacherChoice() {
+      document.getElementById('choice-user').innerHTML =
+        userBadgeHtml('<div class="hint" style="margin-left:auto">教師帳號</div>');
+      showSection('teacher-choice');
     }
 
     function showProfileForm(canCancel) {
@@ -3013,7 +3239,9 @@
        教師帳號名單由收件程式（CONFIG.TEACHERS）判定，網頁只負責顯示。
        音檔一律經收件程式轉送（檔案在 cyril 的雲端硬碟，其他老師沒有直接存取權）。 */
 
-    const admin = { attempts: [], lessons: [], selected: new Set(), audioCache: {} };
+    const admin = { attempts: [], lessons: [], selected: new Set(), audioCache: {}, book: null };
+    const MOBILE = window.matchMedia('(max-width: 640px)');
+    const OTHER_BOOK = '其他';
     const adminPlayer = new Audio();
     const VERDICT_CLASS = { '通過': 'pass', '需重測': 'retest', '判定作弊': 'cheat' };
 
@@ -3024,6 +3252,28 @@
     function lessonLabel(id) {
       const c = LESSON_CATALOG.find(x => x.id === id);
       return c ? `${c.book} ${c.title}` : id;
+    }
+
+    function lessonShort(id) {
+      const c = LESSON_CATALOG.find(x => x.id === id);
+      return c ? c.title : id;
+    }
+
+    function bookOf(id) {
+      const c = LESSON_CATALOG.find(x => x.id === id);
+      return c ? c.book : OTHER_BOOK;
+    }
+
+    /* 版本清單照 LESSON_CATALOG 的順序；之後加新版本，產生器加進 BOOKS 就會自動出現按鈕 */
+    function adminBooks() {
+      const books = [...new Set(LESSON_CATALOG.map(c => c.book))];
+      if (admin.attempts.some(a => bookOf(a.lesson) === OTHER_BOOK)) books.push(OTHER_BOOK);
+      return books;
+    }
+
+    function renderBookChips() {
+      document.getElementById('ad-books').innerHTML = [['', '全部版本'], ...adminBooks().map(b => [b, b])].map(([v, label]) =>
+        `<button type="button" class="chip${(admin.book || '') === v ? ' on' : ''}" data-book="${escapeHtml(v)}">${escapeHtml(label)}</button>`).join('');
     }
 
     function openWideModal(html) {
@@ -3055,16 +3305,26 @@
     function fillSelect(el, items, allLabel) {
       const cur = el.value;
       el.innerHTML = `<option value="">${allLabel}</option>` +
-        items.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(el.id === 'ad-lesson' ? lessonLabel(v) : v)}</option>`).join('');
+        items.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(el.id !== 'ad-lesson' ? v : admin.book ? lessonShort(v) : lessonLabel(v))}</option>`).join('');
       if (items.includes(cur)) el.value = cur;
+    }
+
+    function fillLessonSelect() {
+      const lessonSel = document.getElementById('ad-lesson');
+      const order = id => { const i = LESSON_CATALOG.findIndex(c => c.id === id); return i < 0 ? 999 : i; };
+      const lessons = [...new Set([...admin.lessons, ...admin.attempts.map(a => a.lesson)])]
+        .filter(id => !admin.book || bookOf(id) === admin.book)
+        .sort((x, y) => order(x) - order(y));
+      fillSelect(lessonSel, lessons, admin.book ? `${admin.book} 全部課次` : '全部版本、全部課次');
+      return lessons;
     }
 
     function fillAdminFilters() {
       const lessonSel = document.getElementById('ad-lesson');
-      const first = !lessonSel.options.length;
-      const order = id => { const i = LESSON_CATALOG.findIndex(c => c.id === id); return i < 0 ? 999 : i; };
-      const lessons = [...new Set([...admin.lessons, ...admin.attempts.map(a => a.lesson)])].sort((x, y) => order(x) - order(y));
-      fillSelect(lessonSel, lessons, '全部課次');
+      const first = admin.book === null;
+      if (first) admin.book = LESSON.book;   // 預設：目前這一課的版本與課次
+      renderBookChips();
+      const lessons = fillLessonSelect();
       if (first && lessons.includes(QUIZ_CONFIG.lesson)) lessonSel.value = QUIZ_CONFIG.lesson;
       const classes = [...new Set(admin.attempts.map(a => a.cls).filter(Boolean))].sort();
       fillSelect(document.getElementById('ad-cls'), classes, '全部班級');
@@ -3076,7 +3336,7 @@
       const status = opts && opts.ignoreStatus ? '' : document.getElementById('ad-status').value;
       const q = opts && opts.ignoreStatus ? '' : document.getElementById('ad-search').value.trim().toLowerCase();
       return admin.attempts.filter(a =>
-        (!lesson || a.lesson === lesson) &&
+        (lesson ? a.lesson === lesson : (!admin.book || bookOf(a.lesson) === admin.book)) &&
         (!cls || a.cls === cls) &&
         (!status ||
           (status === 'suspected' && a.suspected > 0) ||
@@ -3100,23 +3360,40 @@
       const visible = new Set(list.map(a => a.id));
       [...admin.selected].forEach(id => { if (!visible.has(id)) admin.selected.delete(id); });
 
-      const rows = list.map(a => {
-        const cls = a.verdict === '判定作弊' ? 'cheat' : a.suspected > 0 ? 'suspect' : '';
-        return `<tr class="${cls}">
-          <td><input type="checkbox" class="ad-chk" data-id="${escapeHtml(a.id)}" ${admin.selected.has(a.id) ? 'checked' : ''}></td>
+      const allChecked = list.length && admin.selected.size === list.length ? 'checked' : '';
+      const chk = a => `<input type="checkbox" class="ad-chk" data-id="${escapeHtml(a.id)}" ${admin.selected.has(a.id) ? 'checked' : ''} aria-label="勾選">`;
+      const rowCls = a => a.verdict === '判定作弊' ? 'cheat' : a.suspected > 0 ? 'suspect' : '';
+      const reviewBtn = a => `<button class="qbtn small" data-review="${escapeHtml(a.id)}">🎧 檢核</button>`;
+      let html;
+      if (MOBILE.matches) {
+        html = (list.length ? `<label class="ad-all-line"><input type="checkbox" id="ad-all" ${allChecked}> 全選目前顯示的 ${list.length} 筆</label>` : '') +
+          (list.map(a => `
+            <div class="ad-card ${rowCls(a)}">
+              ${chk(a)}
+              <div>
+                <div><b>${escapeHtml(a.cls)}${a.seat ? '-' + escapeHtml(a.seat) : ''} ${escapeHtml(a.name)}</b> <span class="hint">第 ${a.attempt} 次</span></div>
+                <div class="hint">${escapeHtml(a.time)}｜${escapeHtml(lessonShort(a.lesson))}</div>
+                <div>${a.suspected > 0 ? `<b>⚠️ 疑似播放 ${a.suspected} 句</b>　` : ''}${verdictHtml(a.verdict)}</div>
+              </div>
+              <div class="ad-card-side"><div class="ad-card-score">${a.total}</div>${reviewBtn(a)}</div>
+            </div>`).join('') || '<div class="hint">沒有符合條件的紀錄</div>');
+      } else {
+        const rows = list.map(a => `<tr class="${rowCls(a)}">
+          <td>${chk(a)}</td>
           <td>${escapeHtml(a.time)}</td><td>${escapeHtml(a.cls)}</td><td>${escapeHtml(a.seat)}</td>
-          <td title="${escapeHtml(a.email)}">${escapeHtml(a.name)}</td><td>${escapeHtml(a.lesson)}</td>
+          <td title="${escapeHtml(a.email)}">${escapeHtml(a.name)}</td><td title="${escapeHtml(lessonLabel(a.lesson))}">${escapeHtml(lessonShort(a.lesson))}</td>
           <td>${a.attempt}</td><td><b>${a.total}</b></td>
           <td>${a.suspected > 0 ? '⚠️ ' + a.suspected : ''}</td><td>${a.listens}</td><td>${a.hidden || ''}</td>
           <td>${verdictHtml(a.verdict)}</td>
-          <td><button class="qbtn small" data-review="${escapeHtml(a.id)}">🎧 檢核</button></td>
-        </tr>`;
-      }).join('');
-      document.getElementById('ad-table').innerHTML = `
-        <tr><th><input type="checkbox" id="ad-all" ${list.length && admin.selected.size === list.length ? 'checked' : ''}></th>
-          <th>時間</th><th>班級</th><th>座號</th><th>姓名</th><th>課次</th><th>次</th><th>總分</th>
-          <th>疑似播放</th><th>聽範例</th><th>離開頁面</th><th>審查</th><th></th></tr>` +
-        (rows || '<tr><td colspan="13">沒有符合條件的紀錄</td></tr>');
+          <td>${reviewBtn(a)}</td>
+        </tr>`).join('');
+        html = `<table class="admin-table">
+          <tr><th><input type="checkbox" id="ad-all" ${allChecked}></th>
+            <th>時間</th><th>班級</th><th>座號</th><th>姓名</th><th>課次</th><th>次</th><th>總分</th>
+            <th>疑似播放</th><th>聽範例</th><th>離開頁面</th><th>審查</th><th></th></tr>` +
+          (rows || '<tr><td colspan="13">沒有符合條件的紀錄</td></tr>') + '</table>';
+      }
+      document.getElementById('ad-list').innerHTML = html;
       document.getElementById('ad-count').textContent =
         `顯示 ${list.length} 筆（全部 ${admin.attempts.length} 筆）` + (admin.selected.size ? `｜已勾選 ${admin.selected.size} 筆` : '');
       document.getElementById('ad-delete').disabled = !admin.selected.size;
@@ -3138,31 +3415,39 @@
         return;
       }
       const sameLesson = a.lesson === QUIZ_CONFIG.lesson;
-      const rows = d.detail.slice().sort((x, y) => x.seq - y.seq).map(det => {
+      const items = d.detail.slice().sort((x, y) => x.seq - y.seq).map(det => {
         const pad = 's' + String(det.seq + 1).padStart(2, '0') + '_';
         const f = d.files.find(ff => ff.name.indexOf(pad) === 0);
         const rp = det.replay || {};
         const text = sameLesson && allSentences[det.seq]
           ? escapeHtml(allSentences[det.seq].text.slice(0, 20)) + (allSentences[det.seq].text.length > 20 ? '…' : '')
           : `第 ${det.seq + 1} 句`;
+        const metrics = `<div class="metrics">包絡 ${rp.envCorr ?? '—'}｜音高差 ${rp.pitchDiff ?? '—'}｜長度比 ${rp.durRatio ?? '—'}</div>`;
+        const btns = (f ? `<button class="qbtn small" data-play="${escapeHtml(f.name)}">▶ 學生</button>` : '<span class="hint">無檔案</span>') +
+          ` <button class="qbtn small light" data-ref="${det.seq}" data-lesson="${escapeHtml(a.lesson)}">▶ 範例</button>`;
+        if (MOBILE.matches) {
+          return `<div class="rv-item ${rp.suspected ? 'suspect' : ''}">
+            <div class="rv-head"><span><b>#${det.seq + 1}</b> ${text}</span><b>${det.total} 分</b></div>
+            <div>${rp.suspected ? '<b>⚠️ 疑似播放</b>　' : ''}<span class="hint">聽範例 ${det.listens || 0}</span></div>
+            ${metrics}<div class="rv-btns">${btns}</div></div>`;
+        }
         return `<tr class="${rp.suspected ? 'suspect' : ''}">
           <td>${det.seq + 1}</td><td>${text}</td><td><b>${det.total}</b></td>
-          <td>${rp.suspected ? '<b>⚠️ 疑似播放</b>' : ''}
-            <div class="metrics">包絡 ${rp.envCorr ?? '—'}｜音高差 ${rp.pitchDiff ?? '—'}｜長度比 ${rp.durRatio ?? '—'}</div></td>
+          <td>${rp.suspected ? '<b>⚠️ 疑似播放</b>' : ''}${metrics}</td>
           <td>聽範例 ${det.listens || 0}</td>
-          <td>${f ? `<button class="qbtn small" data-play="${escapeHtml(f.name)}">▶ 學生</button>` : '<span class="hint">無檔案</span>'}
-            <button class="qbtn small light" data-ref="${det.seq}" data-lesson="${escapeHtml(a.lesson)}">▶ 範例</button></td>
+          <td>${btns}</td>
         </tr>`;
       }).join('');
+      const listHtml = MOBILE.matches ? `<div>${items}</div>` : `<table class="review-list">
+          <tr><th>#</th><th>句子</th><th>分數</th><th>播放偵測</th><th></th><th>聽</th></tr>${items}
+        </table>`;
       const radios = ['', '通過', '需重測', '判定作弊'].map(v =>
         `<label><input type="radio" name="rv-verdict" value="${v}" ${(a.verdict || '') === v ? 'checked' : ''}> ${v || '未審查'}</label>`).join('');
 
       openWideModal(`
         <h3>🎧 檢核：${escapeHtml(a.cls)} 班 ${escapeHtml(a.seat)} 號 ${escapeHtml(a.name)}</h3>
-        <div class="hint">${escapeHtml(a.email)}｜${escapeHtml(a.lesson)} 第 ${a.attempt} 次｜${escapeHtml(a.time)}｜總分 <b>${a.total}</b>｜離開頁面 ${a.hidden || 0} 次</div>
-        <table class="review-list">
-          <tr><th>#</th><th>句子</th><th>分數</th><th>播放偵測</th><th></th><th>聽</th></tr>${rows}
-        </table>
+        <div class="hint">${escapeHtml(a.email)}｜${escapeHtml(lessonLabel(a.lesson))} 第 ${a.attempt} 次｜${escapeHtml(a.time)}｜總分 <b>${a.total}</b>｜離開頁面 ${a.hidden || 0} 次</div>
+        ${listHtml}
         <div><b>審查結果</b>（「判定作弊」的那次不計入最高分）</div>
         <div class="verdict-choices">${radios}</div>
         <textarea class="review-note" id="rv-note" rows="2" maxlength="500" placeholder="備註（選填）">${escapeHtml(a.note || '')}</textarea>
@@ -3280,7 +3565,7 @@
       const csv = '﻿' + [head, ...rows].map(r => r.map(esc).join(',')).join('\r\n');
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-      const lesson = document.getElementById('ad-lesson').value || '全部課次';
+      const lesson = document.getElementById('ad-lesson').value || admin.book || '全部版本';
       const cls = document.getElementById('ad-cls').value || '全部班級';
       a.download = `朗讀測驗成績_${lesson}_${cls}.csv`;
       a.click();
@@ -3289,6 +3574,18 @@
 
     function bindAdmin() {
       ['ad-lesson', 'ad-cls', 'ad-status'].forEach(id => document.getElementById(id).addEventListener('change', renderAdminTable));
+      document.getElementById('ad-books').addEventListener('click', e => {
+        const b = e.target.closest('[data-book]');
+        if (!b) return;
+        admin.book = b.dataset.book;
+        renderBookChips();
+        fillLessonSelect();
+        document.getElementById('ad-lesson').value = '';
+        renderAdminTable();
+      });
+      MOBILE.addEventListener('change', () => { if (admin.attempts.length) renderAdminTable(); });
+      document.getElementById('mode-student').addEventListener('click', showIntro);
+      document.getElementById('mode-admin').addEventListener('click', showAdmin);
       document.getElementById('ad-search').addEventListener('input', renderAdminTable);
       document.getElementById('ad-refresh').addEventListener('click', loadAdmin);
       document.getElementById('ad-csv').addEventListener('click', downloadCsv);
@@ -3296,7 +3593,7 @@
       document.getElementById('ad-student').addEventListener('click', showIntro);
       document.getElementById('btn-back-admin').addEventListener('click', showAdmin);
 
-      const table = document.getElementById('ad-table');
+      const table = document.getElementById('ad-list');
       table.addEventListener('change', e => {
         if (e.target.id === 'ad-all') {
           adminFilter().forEach(a => { if (e.target.checked) admin.selected.add(a.id); else admin.selected.delete(a.id); });
