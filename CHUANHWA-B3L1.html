@@ -2014,7 +2014,7 @@
       </button>
       <button class="mode-btn" id="mode-admin" type="button">
        <span class="mode-icon">🛠️</span><b>教師管理</b>
-       <span class="hint">檢核錄音、審查結果、刪除資料、下載成績</span>
+       <span class="hint">朗讀與生份字、選詞塌空、咱來鬥句、形音義的成績都在同一個管理頁</span>
       </button>
      </div>
      <div class="hint">其他課次：<a href="index.html">回課次列表</a></div>
@@ -2515,6 +2515,17 @@
       return JSON.parse(new TextDecoder().decode(bytes));
     }
 
+    // 登入憑證暫存在分頁的 sessionStorage，與題型測驗網站、整合管理頁共用（同網域 cyril-mingdao.github.io）
+    const TOKEN_KEY = 'mdQuizIdToken';
+    function tryStoredLogin() {
+      try {
+        const token = sessionStorage.getItem(TOKEN_KEY);
+        if (!token) return;
+        const p = decodeJwt(token);
+        if (p.exp && p.exp * 1000 > Date.now() + 5 * 60 * 1000) onCredential({ credential: token });
+      } catch (e) {}
+    }
+
     let gsiInitialized = false;
     let gsiWaitTries = 0;
     function initGoogleLogin() {
@@ -2558,6 +2569,7 @@
         google.accounts.id.disableAutoSelect();
         return;
       }
+      try { sessionStorage.setItem(TOKEN_KEY, resp.credential); } catch (e) {}
       const sameUser = quiz.user && quiz.user.email === email;
       quiz.user = { idToken: resp.credential, email: email, name: payload.name || email, picture: payload.picture || '' };
 
@@ -3417,7 +3429,15 @@
       document.getElementById('quiz-modal-body').classList.add('wide');
     }
 
+    /* 教師管理已整合到題型測驗網站的管理頁（朗讀＋生份字＋選詞塌空＋咱來鬥句＋形音義同一頁）。
+       同一個 github.io 網域，登入憑證放 sessionStorage 帶過去，不必重新登入。 */
+    const INTEGRATED_ADMIN = 'https://cyril-mingdao.github.io/taigi-quiz/admin.html';
     function showAdmin() {
+      try { sessionStorage.setItem(TOKEN_KEY, quiz.user.idToken); } catch (e) {}
+      location.href = INTEGRATED_ADMIN + '?lesson=' + encodeURIComponent(LESSON.id);
+    }
+
+    function showLocalAdmin() {   // 舊版單頁管理（保留備用，目前沒有按鈕會用到）
       document.getElementById('admin-user').innerHTML =
         userBadgeHtml('<div class="hint" style="margin-left:auto">教師帳號</div>');
       showSection('admin-panel');
@@ -3814,6 +3834,7 @@
     document.getElementById('btn-history').addEventListener('click', showHistory);
     document.getElementById('btn-switch').addEventListener('click', () => {
       if (window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect();
+      try { sessionStorage.removeItem(TOKEN_KEY); } catch (e) {}
       quiz.user = null;
       quiz.profile = null;
       quiz.isTeacher = false;
@@ -3846,6 +3867,8 @@
         e.returnValue = '';
       }
     });
+
+    tryStoredLogin();
 
   </script>
   <script src="https://accounts.google.com/gsi/client" async defer onload="initGoogleLogin()"></script>
