@@ -1988,6 +1988,9 @@
 /* 對話課的角色名標籤（練習版課文行首【阿母】→ span.speaker）；官方音檔不唸角色名，不計入評分音節 */
 .speaker { display: inline-block; margin-right: 6px; padding: 1px 8px; border-radius: 999px; background: #111111; color: #fff; font-size: 0.7em; font-weight: bold; vertical-align: middle; white-space: nowrap; }
 
+/* 教師預覽學生填寫基本資料頁（2026-10-01） */
+.teacher-preview { margin: 8px 0; padding: 8px 12px; border-radius: 10px; background: #fffbe6; border: 2px dashed var(--yellow); }
+
   </style>
  </head>
  <body>
@@ -2013,7 +2016,7 @@
      <div class="mode-grid">
       <button class="mode-btn" id="mode-student" type="button">
        <span class="mode-icon">🎤</span><b>學生模式</b>
-       <span class="hint">跟學生一樣點選班級、座號後作答，成績與錄音會記錄在系統</span>
+       <span class="hint">跟學生一樣先看班級座號頁再作答（教師的選擇不儲存），成績與錄音記在班級「教師」</span>
       </button>
       <button class="mode-btn" id="mode-admin" type="button">
        <span class="mode-icon">🛠️</span><b>教師管理</b>
@@ -2026,6 +2029,7 @@
     <section class="quiz-card hidden" id="quiz-profile">
      <h3>請填寫基本資料</h3>
      <div class="hint">成績會依班級、座號彙整給老師，請點選正確的部別、班級與座號。之後可以在測驗說明頁修改。</div>
+     <div class="teacher-preview hidden" id="pf-teacher">🧑‍🏫 <b>教師預覽</b>：這是學生登入後看到的基本資料頁，可以照學生的方式點選、按「儲存並繼續」檢查；教師的選擇<b>不會儲存</b>，成績一律記在班級「教師」。</div>
      <form id="profile-form" class="profile-form" autocomplete="off">
       <div class="pf-field">
        <div class="pf-label">部別</div>
@@ -2698,7 +2702,11 @@
       document.getElementById('pf-name').value = p.name || quiz.user.name || '';
       document.getElementById('pf-email').value = quiz.user.email;
       document.getElementById('pf-msg').textContent = '';
-      document.getElementById('pf-cancel').classList.toggle('hidden', !canCancel);
+      // 教師進學生模式也看這一頁（預覽學生畫面、人工檢查），但選擇不送出，成績一律記在班級「教師」
+      document.getElementById('pf-teacher').classList.toggle('hidden', !quiz.isTeacher);
+      const cancelBtn = document.getElementById('pf-cancel');
+      cancelBtn.textContent = quiz.isTeacher ? '略過，直接看測驗說明' : '取消';
+      cancelBtn.classList.toggle('hidden', !canCancel);
       showSection('quiz-profile');
     }
 
@@ -2715,6 +2723,11 @@
       if (!body.cls) { msg.textContent = '請點選部別與班級。'; return; }
       if (!body.seat) { msg.textContent = '請點選座號。'; return; }
       if (!body.name) { msg.textContent = '請輸入姓名。'; return; }
+      if (quiz.isTeacher) {   // 教師預覽：檢查流程跟學生一樣，但不送出
+        toast(`教師預覽：${body.cls} ${body.seat} 號 ${body.name} 檢查通過（不儲存，成績記在「教師」）`);
+        showIntro();
+        return;
+      }
       btn.disabled = true;
       msg.textContent = '';
       try {
@@ -2736,13 +2749,13 @@
       document.getElementById('intro-count').textContent = allSentences.length;
       document.getElementById('quiz-intro').dataset.seen = '1';
       document.getElementById('btn-back-admin').classList.toggle('hidden', !quiz.isTeacher);
-      document.getElementById('btn-edit-profile').classList.toggle('hidden', quiz.isTeacher);
       showSection('quiz-intro');
     }
 
-    /* 教師切到學生模式：班級一律記為「教師」（收件程式決定），與各班區隔，不必點選班級座號 */
+    /* 教師切到學生模式：先顯示學生的班級座號頁（預覽、人工檢查，不儲存）；
+       成績一律記為班級「教師」（收件程式決定），與各班區隔 */
     function enterStudentMode() {
-      showIntro();
+      showProfileForm(true);
     }
 
     /* ===================== 課文呈現（測驗版：只有 🔊 聽一次 與 🎤 錄音） ===================== */
@@ -3852,8 +3865,7 @@
       if (!document.getElementById('quiz-profile').classList.contains('hidden')) renderProfileChips();
     });
     document.getElementById('pf-cancel').addEventListener('click', () => {
-      if (quiz.isTeacher && !document.getElementById('quiz-intro').dataset.seen) showTeacherChoice();
-      else showIntro();
+      showIntro();
     });
     bindAdmin();
     document.getElementById('btn-submit').addEventListener('click', () => {
