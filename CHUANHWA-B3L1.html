@@ -2736,12 +2736,13 @@
       document.getElementById('intro-count').textContent = allSentences.length;
       document.getElementById('quiz-intro').dataset.seen = '1';
       document.getElementById('btn-back-admin').classList.toggle('hidden', !quiz.isTeacher);
+      document.getElementById('btn-edit-profile').classList.toggle('hidden', quiz.isTeacher);
       showSection('quiz-intro');
     }
 
-    /* 教師切到學生模式：跟學生一樣先點選班級、座號（帶入上次選的），再進測驗說明 */
+    /* 教師切到學生模式：班級一律記為「教師」（收件程式決定），與各班區隔，不必點選班級座號 */
     function enterStudentMode() {
-      showProfileForm(true);
+      showIntro();
     }
 
     /* ===================== 課文呈現（測驗版：只有 🔊 聽一次 與 🎤 錄音） ===================== */
