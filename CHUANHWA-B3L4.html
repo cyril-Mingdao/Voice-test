@@ -2014,7 +2014,7 @@
 
     <section class="quiz-card" id="quiz-gate">
      <h3>請先用學校帳號登入</h3>
-     <div>本測驗會記錄成績，請用 <b>@ms.mingdao.edu.tw</b> 的學校 Google 帳號登入。</div>
+     <div>本測驗會記錄成績，請用 <b>@ms.mingdao.edu.tw</b> 的學校 Google 帳號登入（金門大學同學請用老師登記的 Gmail 帳號）。</div>
      <div id="gsi-btn"></div>
      <div class="hint" id="gate-msg">登入按鈕沒出現？請確認網路連線，並用電腦版 Chrome 或 Edge 開啟本頁。</div>
     </section>
@@ -2560,7 +2560,6 @@
       google.accounts.id.initialize({
         client_id: QUIZ_CONFIG.clientId,
         callback: onCredential,
-        hd: QUIZ_CONFIG.domain,
         ux_mode: 'popup',
         auto_select: false,
         cancel_on_tap_outside: true
@@ -2579,12 +2578,7 @@
       let payload;
       try { payload = decodeJwt(resp.credential); } catch (e) { toast('登入資料解析失敗，請再試一次'); return; }
       const email = String(payload.email || '').toLowerCase();
-      if (payload.hd !== QUIZ_CONFIG.domain || !email.endsWith('@' + QUIZ_CONFIG.domain)) {
-        document.getElementById('gate-msg').innerHTML =
-          `<span class="warn">⚠️ ${escapeHtml(email)} 不是學校帳號，請改用 @${QUIZ_CONFIG.domain} 登入。</span>`;
-        google.accounts.id.disableAutoSelect();
-        return;
-      }
+      // 帳號是否可用（明道網域或校外名單，例如金門大學）由收件程式判定，網頁不先擋
       try { sessionStorage.setItem(TOKEN_KEY, resp.credential); } catch (e) {}
       const sameUser = quiz.user && quiz.user.email === email;
       quiz.user = { idToken: resp.credential, email: email, name: payload.name || email, picture: payload.picture || '' };
@@ -2621,6 +2615,7 @@
         const d = await api({ action: 'profile_get' });
         quiz.isTeacher = !!d.isTeacher;
         quiz.profile = d.profile;
+        quiz.profileLocked = !!d.locked;   // 校外名單學生：班級座號姓名由老師設定，不能自己改
         msg.textContent = '';
         if (quiz.isTeacher) showTeacherChoice();
         else if (!quiz.profile) showProfileForm(false);
@@ -2703,6 +2698,11 @@
     }
 
     function showProfileForm(canCancel) {
+      if (quiz.profileLocked && quiz.profile) {
+        toast(`你的資料由老師設定：${quiz.profile.cls} ${quiz.profile.seat} 號 ${quiz.profile.name}`);
+        showIntro();
+        return;
+      }
       const p = quiz.profile || {};
       pf.cls = p.cls && deptOfClass(p.cls) ? p.cls : '';
       pf.dept = deptOfClass(pf.cls);
