@@ -2612,6 +2612,8 @@
         quiz.isTeacher = !!d.isTeacher;
         quiz.profile = d.profile;
         quiz.profileLocked = !!d.locked;   // 校外名單學生：班級座號姓名由老師設定，不能自己改
+        const editBtn = document.getElementById('btn-edit-profile');
+        if (editBtn) editBtn.classList.toggle('hidden', quiz.profileLocked);
         msg.textContent = '';
         if (quiz.isTeacher) showTeacherChoice();
         else if (!quiz.profile) showProfileForm(false);
