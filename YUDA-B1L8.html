@@ -1996,6 +1996,10 @@
 /* 教師預覽學生填寫基本資料頁（2026-10-01） */
 .teacher-preview { margin: 8px 0; padding: 8px 12px; border-radius: 10px; background: #fffbe6; border: 2px dashed var(--yellow); }
 
+/* 作答頁滿版（2026-11-15 老師要求：左右留白移除，把空間讓給課文與題目）；管理頁維持自己的寬度 */
+body:not(.admin-mode) .container { max-width: none; }
+body:not(.admin-mode):not(.index-page) { padding-left: max(8px, 1.2vw); padding-right: max(8px, 1.2vw); }
+
   </style>
  </head>
  <body>
